@@ -1,0 +1,181 @@
+/* ————————————————————————————————————————————————————
+   Layout general de la sección “Best Paired with”
+   ———————————————————————————————————————————————————— */
+.paired-with:not(:first-of-type) {
+  display: none !important;
+}
+.paired-with {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #fff;
+}
+
+.paired-with__title {
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+/* ————————————————————————————————————————————————————
+   Contenedor de cada producto: imagen + detalles
+   ———————————————————————————————————————————————————— */
+.paired-with__content {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+/* ————————————————————————————————————————————————————
+   Slider de imágenes
+   ———————————————————————————————————————————————————— */
+.paired-with__image-slider {
+  flex: 1;
+  max-width: 50%;
+  position: relative;
+}
+
+.paired-with__image-slider .swiper {
+  overflow: hidden;
+}
+
+.paired-with__image-slider .swiper-wrapper {
+  display: flex;
+}
+
+.paired-with__image-slider .swiper-slide {
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.paired-with__image-slider img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  border-radius: 4px;
+}
+
+/* ————————————————————————————————————————————————————
+   Detalles del producto
+   ———————————————————————————————————————————————————— */
+.paired-with__detail-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-name {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.product-pricing {
+  margin-bottom: 1rem;
+}
+
+.price--current {
+  font-weight: 600;
+  margin-right: 0.5rem;
+  color: #000;
+}
+
+.price--original {
+  color: #888;
+  text-decoration: line-through;
+}
+
+/* ————————————————————————————————————————————————————
+   Opciones
+   ———————————————————————————————————————————————————— */
+.product-options {
+  margin-bottom: 1rem;
+}
+
+.option-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: black;
+}
+
+.option-select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+}
+
+/* ————————————————————————————————————————————————————
+   Botón Add to Cart
+   ———————————————————————————————————————————————————— */
+.btn--add-to-cart {
+  margin-top: auto;
+  padding: 0.75rem;
+  background: #333;
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.btn--add-to-cart:hover {
+  opacity: 0.9;
+}
+
+.btn--add-to-cart:disabled {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ————————————————————————————————————————————————————
+   Navegación y paginación del slider
+   ———————————————————————————————————————————————————— */
+
+.swiper-button-prev {
+  left: 0;
+}
+
+.swiper-button-next {
+  right: 0;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 1rem;
+  color: #333;
+}
+
+/* ————————————————————————————————————————————————————
+   Responsive
+   ———————————————————————————————————————————————————— */
+@media (max-width: 768px) {
+  .paired-with__content {
+    flex-direction: column;
+  }
+
+  .paired-with__image-slider,
+  .paired-with__detail-item {
+    max-width: 100%;
+    width: 100%;
+  }
+}
