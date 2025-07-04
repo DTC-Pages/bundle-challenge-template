@@ -15,6 +15,7 @@
   {{ 'component-slider.css' | asset_url | stylesheet_tag }}
   {{ 'component-rating.css' | asset_url | stylesheet_tag }}
   {{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
+  {{ 'component-bundle.css' | asset_url | stylesheet_tag }}
 
   {% unless product.has_only_default_variant %}
     {{ 'component-product-variant-picker.css' | asset_url | stylesheet_tag }}
@@ -41,6 +42,7 @@
 
   <script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'component-bundle.js' | asset_url }}" defer="defer"></script>
   {%- if product.quantity_price_breaks_configured? -%}
     <script src="{{ 'show-more.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'price-per-item.js' | asset_url }}" defer="defer"></script>
@@ -356,7 +358,10 @@
                                 </dt>
                                 <dd>
                                   <span class="price-per-item--current">
-                                    {{- 'products.product.volume_pricing.price_at_each_html' | t: price: variant_price -}}
+                                    {{-
+                                      'products.product.volume_pricing.price_at_each_html'
+                                      | t: price: variant_price
+                                    -}}
                                   </span>
                                 </dd>
                               </dl>
@@ -660,6 +665,109 @@
                 </product-recommendations>
               {%- when 'icon-with-text' -%}
                 {% render 'icon-with-text', block: block %}
+              {%- when 'bundle' -%}
+                {%- assign bundle_blocks = section.blocks | where: 'type', 'bundle' -%}
+                {%- for block in bundle_blocks -%}
+                  {%- assign bprod = all_products[block.settings.bundle_product] -%}
+                  {%- assign target_product = all_products[block.settings.applies_to_product] -%}
+                  {%- if bprod and target_product and target_product.id == product.id and bprod.id != product.id -%}
+                    <section class="paired-with" aria-label="Best Paired with products">
+                      <h2 class="paired-with__title">Best Paired with</h2>
+
+                      <div class="paired-with__content" role="region" aria-labelledby="product-title-{{ block.id }}">
+                        <!-- Slider de imágenes del producto -->
+                        <div class="paired-with__image-slider">
+                          <div class="swiper" aria-label="Product image gallery">
+                            <div class="swiper-wrapper">
+                              {%- for image in bprod.images -%}
+                                {% assign variant_ids = '' %}
+                                {%- for variant in bprod.variants -%}
+                                  {%- if variant.featured_image and variant.featured_image.id == image.id -%}
+                                    {% assign variant_ids = variant_ids | append: variant.id | append: ',' %}
+                                  {%- endif -%}
+                                {%- endfor -%}
+                                {% assign variant_ids = variant_ids | strip | strip_newlines | remove_last: ',' %}
+                                <div class="swiper-slide">
+                                  <a href="{{ bprod.url }}">
+                                    <img
+                                      src="{{ image | img_url: '400x300' }}"
+                                      alt="{{ image.alt | escape | default: bprod.title }}"
+                                      loading="lazy"
+                                      width="400"
+                                      height="300"
+                                      data-variant-ids="{{ variant_ids }}"
+                                      role="img"
+                                      aria-label="{{ image.alt | escape | default: bprod.title }}"
+                                    >
+                                  </a>
+                                </div>
+                              {%- endfor -%}
+                            </div>
+                            <div
+                              class="swiper-button-prev"
+                              role="button"
+                              tabindex="0"
+                              aria-label="Previous image"
+                            ></div>
+                            <div class="swiper-button-next" role="button" tabindex="0" aria-label="Next image"></div>
+                          </div>
+                        </div>
+
+                        <!-- Detalles del producto -->
+                        <div
+                          class="paired-with__detail-item"
+                          data-variants="{{ bprod.variants | json | escape }}"
+                        >
+                          <h3 class="product-name" id="product-title-{{ block.id }}">{{ bprod.title }}</h3>
+
+                          {% assign original_price = bprod.price %}
+                          {% assign sale_price = original_price | times: 90 | divided_by: 100 %}
+
+                          <div class="product-pricing" aria-labelledby="product-title-{{ block.id }}">
+                            <span class="price--current" aria-label="Sale price">{{ sale_price | money }}</span>
+                            <s class="price--original" aria-label="Original price">{{ original_price | money }}</s>
+                          </div>
+
+                          {%- for option in bprod.options_with_values -%}
+                            <div class="product-options product-options--{{ option.name | handleize }}">
+                              <label class="option-label" for="Option-{{ block.id }}-{{ forloop.index0 }}">
+                                {{ option.name }}
+                              </label>
+                              <select
+                                id="Option-{{ block.id }}-{{ forloop.index0 }}"
+                                class="option-select"
+                                data-option-index="{{ forloop.index0 }}"
+                                aria-label="{{ option.name }}"
+                              >
+                                {%- for value in option.values -%}
+                                  <option
+                                    value="{{ value }}"
+                                    {% if value == option.selected_value %}
+                                      selected
+                                    {% endif %}
+                                  >
+                                    {{ value }}
+                                  </option>
+                                {%- endfor -%}
+                              </select>
+                            </div>
+                          {%- endfor -%}
+
+                          <button
+                            type="button"
+                            class="btn btn--add-to-cart"
+                            data-variant-id="{{ bprod.selected_or_first_available_variant.id }}"
+                            data-main-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                            aria-labelledby="product-title-{{ block.id }}"
+                            aria-live="polite"
+                          >
+                            Add to Cart
+                          </button>
+                        </div>
+                      </div>
+                    </section>
+                  {%- endif -%}
+                {%- endfor -%}
             {%- endcase -%}
           {%- endfor -%}
           <a href="{{ product.url }}" class="link product__view-details animate-arrow">
@@ -730,6 +838,23 @@
   "tag": "section",
   "class": "section",
   "blocks": [
+    {
+      "type": "bundle",
+      "name": "Paired with (Bundle)",
+      "limit": 10,
+      "settings": [
+        {
+          "type": "product",
+          "id": "bundle_product",
+          "label": "Select bundle product"
+        },
+        {
+          "type": "product",
+          "id": "applies_to_product",
+          "label": "Show this bundle only on"
+        }
+      ]
+    },
     {
       "type": "@app"
     },
@@ -1674,7 +1799,7 @@
         {
           "type": "header",
           "content": "t:sections.main-product.blocks.icon_with_text.settings.pairing_2.label"
-        },        
+        },
         {
           "type": "select",
           "id": "icon_2",
@@ -1874,7 +1999,7 @@
         {
           "type": "header",
           "content": "t:sections.main-product.blocks.icon_with_text.settings.pairing_3.label"
-        },        
+        },
         {
           "type": "select",
           "id": "icon_3",
@@ -2176,7 +2301,7 @@
       ],
       "default": "hide",
       "label": "t:sections.main-product.settings.mobile_thumbnails.label"
-    },    
+    },
     {
       "type": "select",
       "id": "media_position",
