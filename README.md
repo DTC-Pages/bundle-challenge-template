@@ -212,6 +212,6 @@ shopify theme serve
 
 ## Pull Requests
 
-- **Bundle extension**: https://github.com/Juanda1992/bundle-checkout-banner/tree/feat/bundle-checkout-extension
-- **Bundle function**: https://github.com/Juanda1992/Bundle_function/tree/feat/bundle-function
+- **Bundle extension**: https://github.com/Juanda1992/bundle-checkout-banner/pull/1
+- **Bundle function**: https://github.com/Juanda1992/Bundle_function/pull/1
 
